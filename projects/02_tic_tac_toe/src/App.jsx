@@ -4,11 +4,20 @@ import { Square } from "./components/Square.jsx"
 import {TURNS} from "./components/const.js"
 import { checkWinnerFrom, checkEndGame } from "./logic/board.js"
 import { WinnerModal } from "./components/WinnerModal.jsx"
+import { saveGameStorage, resetGameStorage } from "./logic/storage/index.js"
 
 function App() {
-  const [board, setBoard] = useState(Array(9).fill(null))
+  const [board, setBoard] = useState( () => {
+    const boardFromStorage = window.localStorage.getItem('board')
+    return boardFromStorage ? JSON.parse(boardFromStorage) : Array(9).fill(null)
+    //Si existe el boardFromStorage, usamos la funcion parse para inicializar el estado
+    //Sino se se usa el valor por defecto que es dejat las 9 casillas en null
+  })
   // console.log("Board: " + board)
-  const [turn, setTurn] = useState(TURNS.X)
+  const [turn, setTurn] = useState( () => {
+    const turnFromStorage = window.localStorage.getItem('turn')
+    return turnFromStorage ?? TURNS.X
+  })
 
   const [winner, setWinner] = useState(null)
 
@@ -16,6 +25,8 @@ function App() {
     setBoard(Array(9).fill(null))
     setTurn(TURNS.X)
     setWinner(null)
+
+    resetGameStorage()
   }
 
  
@@ -29,7 +40,13 @@ function App() {
     const newTurn = turn == TURNS.X ? TURNS.O : TURNS.X   //cambiar el turno
     setTurn(newTurn)
 
-    const newWinner = checkWinnerFrom(newBoard)
+    //guardar partida
+    saveGameStorage({
+      board: newBoard,
+      turn: newTurn
+    })
+
+    const newWinner = checkWinnerFrom(newBoard)   //revisar si hay ganador
     if (newWinner) {
       confetti()
       setWinner(newWinner)
