@@ -39,7 +39,7 @@ function App() {
 
     const newTurn = turn == TURNS.X ? TURNS.O : TURNS.X   //cambiar el turno
     setTurn(newTurn)
-
+ 
     //guardar partida
     saveGameStorage({
       board: newBoard,
