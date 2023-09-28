@@ -1,7 +1,8 @@
 import './App.css'
 import { useMovies } from './hooks/useMovies'
 import { Movies } from './components/Movies.jsx'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
+import debounce from 'just-debounce-it'
 
 function useSearch() {
   const [search, updateSearch] = useState('')
@@ -28,18 +29,26 @@ function useSearch() {
     setError(null)
   }, [search])
 
-  return { search, updateSearch, error}
+  return { search, updateSearch, error }
 }
 
 function App() {
   const [sort, setSort] = useState(false)
-  const {search, updateSearch, error} = useSearch()
-  const { movies, loading, getMovies } = useMovies({search, sort})
+  const { search, updateSearch, error } = useSearch()
+  const { movies, loading, getMovies } = useMovies({ search, sort })
   //const [query, setQuery] = useState('')  //Form controlado
+
+  const debouncedMovies = useCallback(
+    debounce(search => {
+      console.log('search', search)
+      getMovies({ search })
+    }, 300)
+    , [getMovies]
+  )
 
   const handleSubmit = (event) => {
     event.preventDefault()
-    getMovies({search})
+    getMovies({ search })
   }
 
   const handleSort = () => {
@@ -51,7 +60,7 @@ function App() {
     //if (newQuery.startsWith(' ')) return   //Pre-svalidacion sin settear el estado (Controlada)
     const newSearch = event.target.value
     updateSearch(newSearch)
-    getMovies({search: newSearch})
+    debouncedMovies(newSearch)
   }
 
 
@@ -75,10 +84,10 @@ function App() {
       </header>
 
       <main>
-            {
-              loading ? <p>Cargando...</p> : <Movies movies={movies} />
-            }
-        
+        {
+          loading ? <p>Cargando...</p> : <Movies movies={movies} />
+        }
+
       </main>
     </div>
   )
