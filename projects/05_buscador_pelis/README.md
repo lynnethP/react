@@ -6,6 +6,8 @@ API a usar: - https://www.omdbapi.com/ Consigue la API Key en la propia página 
 
 API_KEY: 9dd0c8ff
 
+URL a usar-> http://www.omdbapi.com/?apikey=9dd0c8ff&s=${search}
+
 Requerimientos:
 
 ✅ Necesita mostrar un input para buscar la película y un botón para buscar.
